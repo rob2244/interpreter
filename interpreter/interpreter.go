@@ -18,24 +18,25 @@ func NewInterpreter(text string) *Interpreter {
 
 // GetNextToken returns the next token and increments the counter
 func (i *Interpreter) getNextToken() (*Token, error) {
+	i.skipWhitespace()
+
 	if i.pos > len(i.text)-1 {
 		return NewToken(EOF, ""), nil
 	}
 
-	char := string(i.text[i.pos])
-	_, err := strconv.ParseInt(char, 10, 64)
+	_, err := strconv.ParseInt(i.currentChar(), 10, 64)
 
 	switch {
-	case char == "+":
+	case i.currentChar() == "+":
 		i.pos++
-		return NewToken(PLUS, char), nil
-	case char == " ":
-		return NewToken(WHITESPACE, char), nil
+		return NewToken(PLUS, i.currentChar()), nil
+	case i.currentChar() == "-":
+		i.pos++
+		return NewToken(MINUS, i.currentChar()), nil
 	case err == nil:
-		i.pos++
-		return NewToken(INTEGER, char), nil
+		return NewToken(INTEGER, i.integer()), nil
 	default:
-		return nil, fmt.Errorf("%s is an unknown token type", char)
+		return nil, fmt.Errorf("%s is an unknown token type", i.currentChar())
 	}
 }
 
@@ -56,34 +57,71 @@ func (i *Interpreter) eat(t TokenType) error {
 	return fmt.Errorf("%s incorrect token type", t)
 }
 
+func (i *Interpreter) term() int64 {
+	token := i.currentToken
+	i.eat(INTEGER)
+
+	return token.Value.(int64)
+}
+
 func (i *Interpreter) Expr() (int64, error) {
-	nextToken, err := i.getNextToken()
+	var err error
+	i.currentToken, err = i.getNextToken()
 
 	if err != nil {
 		return 0, err
 	}
 
-	i.currentToken = nextToken
-	left, _ := strconv.ParseInt(i.currentToken.Value, 10, 64)
+	result := i.term()
 
-	err = i.eat(INTEGER)
+	for i.currentToken.Type == PLUS || i.currentToken.Type == MINUS {
+		token := i.currentToken
+		if token.Type == PLUS {
+			i.eat(PLUS)
+			result += i.term()
+		}
 
-	if err != nil {
-		return 0, err
+		if token.Type == MINUS {
+			i.eat(MINUS)
+			result -= i.term()
+		}
 	}
 
-	err = i.eat(PLUS)
+	return result, nil
+}
 
-	if err != nil {
-		return 0, err
+func (i *Interpreter) skipWhitespace() {
+	if i.pos > len(i.text)-1 {
+		return
 	}
 
-	right, _ := strconv.ParseInt(i.currentToken.Value, 10, 64)
-	err = i.eat(INTEGER)
+	for txt := string(i.text[i.pos]); txt == " "; txt = i.currentChar() {
+		i.pos = i.pos + 1
+	}
+}
 
-	if err != nil {
-		return 0, err
+func (i *Interpreter) integer() int64 {
+	numString := ""
+
+	for i.pos < len(i.text) {
+		_, err := strconv.ParseInt(i.currentChar(), 10, 64)
+
+		if err != nil {
+			break
+		}
+
+		numString += i.currentChar()
+		i.pos++
 	}
 
-	return left + right, nil
+	result, _ := strconv.ParseInt(numString, 10, 64)
+	return result
+}
+
+func (i *Interpreter) currentChar() string {
+	if i.pos-1 > len(i.text) {
+		return ""
+	}
+
+	return string(i.text[i.pos])
 }
