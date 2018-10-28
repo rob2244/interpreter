@@ -41,6 +41,12 @@ func (l *MultLexer) GetNextToken() (*Token, error) {
 	case currentChar == '-':
 		l.pos++
 		return NewToken(MINUS, currentChar), nil
+	case currentChar == '(':
+		l.pos++
+		return NewToken(LPAREN, currentChar), nil
+	case currentChar == ')':
+		l.pos++
+		return NewToken(RPAREN, currentChar), nil
 	case unicode.IsDigit(currentChar):
 		return NewToken(INTEGER, l.integer()), nil
 	default:

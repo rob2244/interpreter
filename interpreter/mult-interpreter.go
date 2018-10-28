@@ -10,14 +10,23 @@ type MultInterpreter struct {
 }
 
 func NewMultInterpreter(lexer Lexer) *MultInterpreter {
-	return &MultInterpreter{lexer: lexer}
+	token, _ := lexer.GetNextToken()
+	return &MultInterpreter{lexer: lexer, currentToken: token}
 }
 
 func (m *MultInterpreter) factor() int64 {
-	val := m.currentToken.Value.(int64)
-	m.eat(INTEGER)
+	if m.currentToken.Type == INTEGER {
+		val := m.currentToken.Value.(int64)
 
-	return val
+		m.eat(INTEGER)
+		return val
+	}
+
+	m.eat(LPAREN)
+	result, _ := m.Expr()
+	m.eat(RPAREN)
+
+	return result
 }
 
 func (m *MultInterpreter) eat(tokenType TokenType) error {
@@ -31,21 +40,10 @@ func (m *MultInterpreter) eat(tokenType TokenType) error {
 	return err
 }
 
-func (m *MultInterpreter) Expr() (int64, error) {
-	var err error
-	m.currentToken, err = m.lexer.GetNextToken()
-
-	if err != nil {
-		return 0, err
-	}
-
+func (m *MultInterpreter) term() int64 {
 	result := m.factor()
 
-	if err != nil {
-		return 0, err
-	}
-
-	for m.currentToken.Type == MULTIPLY || m.currentToken.Type == DIVIDE || m.currentToken.Type == PLUS || m.currentToken.Type == MINUS {
+	for m.currentToken.Type == MULTIPLY || m.currentToken.Type == DIVIDE {
 		if m.currentToken.Type == MULTIPLY {
 			m.eat(MULTIPLY)
 			result *= m.factor()
@@ -55,15 +53,23 @@ func (m *MultInterpreter) Expr() (int64, error) {
 			m.eat(DIVIDE)
 			result /= m.factor()
 		}
+	}
 
+	return result
+}
+
+func (m *MultInterpreter) Expr() (int64, error) {
+	result := m.term()
+
+	for m.currentToken.Type == PLUS || m.currentToken.Type == MINUS {
 		if m.currentToken.Type == PLUS {
 			m.eat(PLUS)
-			result += m.factor()
+			result += m.term()
 		}
 
 		if m.currentToken.Type == MINUS {
 			m.eat(MINUS)
-			result -= m.factor()
+			result -= m.term()
 		}
 	}
 

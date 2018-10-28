@@ -14,6 +14,8 @@ const (
 	MINUS    TokenType = "MINUS"
 	DIVIDE   TokenType = "DIVIDE"
 	MULTIPLY TokenType = "MULTIPLY"
+	LPAREN   TokenType = "LPAREN"
+	RPAREN   TokenType = "RPAREN"
 )
 
 // Token represents a syntax token

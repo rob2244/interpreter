@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"robinseitz/interpreter/interpreter"
+	"github.com/rob2244/interpreter/ast"
+	"github.com/rob2244/interpreter/interpreter"
 )
 
 // func main() {
@@ -13,11 +13,27 @@ import (
 // 	fmt.Println(i.Expr())
 // }
 
+// func main() {
+// 	scanner := bufio.NewScanner(os.Stdin)
+
+// 	for scanner.Scan() {
+// 		exp := scanner.Text()
+
+// 		l := interpreter.NewLexer(exp)
+// 		i := interpreter.NewMultInterpreter(l)
+
+// 		fmt.Println(i.Expr())
+// 	}
+// }
+
 func main() {
-	expr := "12 * 2 / 3 * 22 / 12 + 22 - 1 + 23"
+	mulToken := interpreter.NewToken(interpreter.MULTIPLY, '*')
+	plusToken := interpreter.NewToken(interpreter.PLUS, '+')
+	mulNode := ast.NewBinOp(
+		mulToken,
+		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 2)),
+		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 7)))
 
-	l := interpreter.NewLexer(expr)
-	i := interpreter.NewMultInterpreter(l)
-
-	fmt.Println(i.Expr())
+	addNode := ast.NewBinOp(plusToken, mulNode,
+		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 3)))
 }
