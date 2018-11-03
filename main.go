@@ -1,8 +1,12 @@
 package main
 
 import (
-	"github.com/rob2244/interpreter/ast"
-	"github.com/rob2244/interpreter/interpreter"
+	"bufio"
+	"fmt"
+	"os"
+	"robinseitz/interpreter/ast"
+	"robinseitz/interpreter/interpreter"
+	"robinseitz/interpreter/lexer"
 )
 
 // func main() {
@@ -27,13 +31,15 @@ import (
 // }
 
 func main() {
-	mulToken := interpreter.NewToken(interpreter.MULTIPLY, '*')
-	plusToken := interpreter.NewToken(interpreter.PLUS, '+')
-	mulNode := ast.NewBinOp(
-		mulToken,
-		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 2)),
-		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 7)))
+	scanner := bufio.NewScanner(os.Stdin)
 
-	addNode := ast.NewBinOp(plusToken, mulNode,
-		ast.NewNum(interpreter.NewToken(interpreter.INTEGER, 3)))
+	for scanner.Scan() {
+		exp := scanner.Text()
+
+		l := lexer.NewLexer(exp)
+		p := ast.NewParser(l)
+		i := interpreter.NewTreeInterpreter(p)
+
+		fmt.Println(i.Interpret())
+	}
 }

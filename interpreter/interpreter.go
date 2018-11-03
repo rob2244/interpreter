@@ -2,13 +2,14 @@ package interpreter
 
 import (
 	"fmt"
+	"robinseitz/interpreter/lexer"
 	"strconv"
 )
 
 type Interpreter struct {
 	text         string
 	pos          int
-	currentToken *Token
+	currentToken *lexer.Token
 }
 
 // NewInterpreter creates a new interpreter with the given text
@@ -17,11 +18,11 @@ func NewInterpreter(text string) *Interpreter {
 }
 
 // GetNextToken returns the next token and increments the counter
-func (i *Interpreter) getNextToken() (*Token, error) {
+func (i *Interpreter) getNextToken() (*lexer.Token, error) {
 	i.skipWhitespace()
 
 	if i.pos > len(i.text)-1 {
-		return NewToken(EOF, ""), nil
+		return lexer.NewToken(lexer.EOF, ""), nil
 	}
 
 	_, err := strconv.ParseInt(i.currentChar(), 10, 64)
@@ -29,12 +30,12 @@ func (i *Interpreter) getNextToken() (*Token, error) {
 	switch {
 	case i.currentChar() == "+":
 		i.pos++
-		return NewToken(PLUS, i.currentChar()), nil
+		return lexer.NewToken(lexer.PLUS, i.currentChar()), nil
 	case i.currentChar() == "-":
 		i.pos++
-		return NewToken(MINUS, i.currentChar()), nil
+		return lexer.NewToken(lexer.MINUS, i.currentChar()), nil
 	case err == nil:
-		return NewToken(INTEGER, i.integer()), nil
+		return lexer.NewToken(lexer.INTEGER, i.integer()), nil
 	default:
 		return nil, fmt.Errorf("%s is an unknown token type", i.currentChar())
 	}
@@ -42,7 +43,7 @@ func (i *Interpreter) getNextToken() (*Token, error) {
 
 // Eat takes in a token type and checks if the current token is of the same type
 // if it is it advances to the next token, if not it returns an error
-func (i *Interpreter) eat(t TokenType) error {
+func (i *Interpreter) eat(t lexer.TokenType) error {
 	if i.currentToken.Type == t {
 		token, err := i.getNextToken()
 
@@ -59,7 +60,7 @@ func (i *Interpreter) eat(t TokenType) error {
 
 func (i *Interpreter) term() int64 {
 	token := i.currentToken
-	i.eat(INTEGER)
+	i.eat(lexer.INTEGER)
 
 	return token.Value.(int64)
 }
@@ -74,15 +75,15 @@ func (i *Interpreter) Expr() (int64, error) {
 
 	result := i.term()
 
-	for i.currentToken.Type == PLUS || i.currentToken.Type == MINUS {
+	for i.currentToken.Type == lexer.PLUS || i.currentToken.Type == lexer.MINUS {
 		token := i.currentToken
-		if token.Type == PLUS {
-			i.eat(PLUS)
+		if token.Type == lexer.PLUS {
+			i.eat(lexer.PLUS)
 			result += i.term()
 		}
 
-		if token.Type == MINUS {
-			i.eat(MINUS)
+		if token.Type == lexer.MINUS {
+			i.eat(lexer.MINUS)
 			result -= i.term()
 		}
 	}

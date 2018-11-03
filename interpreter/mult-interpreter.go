@@ -2,34 +2,35 @@ package interpreter
 
 import (
 	"fmt"
+	"robinseitz/interpreter/lexer"
 )
 
 type MultInterpreter struct {
-	lexer        Lexer
-	currentToken *Token
+	lexer        lexer.Lexer
+	currentToken *lexer.Token
 }
 
-func NewMultInterpreter(lexer Lexer) *MultInterpreter {
+func NewMultInterpreter(lexer lexer.Lexer) *MultInterpreter {
 	token, _ := lexer.GetNextToken()
 	return &MultInterpreter{lexer: lexer, currentToken: token}
 }
 
 func (m *MultInterpreter) factor() int64 {
-	if m.currentToken.Type == INTEGER {
+	if m.currentToken.Type == lexer.INTEGER {
 		val := m.currentToken.Value.(int64)
 
-		m.eat(INTEGER)
+		m.eat(lexer.INTEGER)
 		return val
 	}
 
-	m.eat(LPAREN)
+	m.eat(lexer.LPAREN)
 	result, _ := m.Expr()
-	m.eat(RPAREN)
+	m.eat(lexer.RPAREN)
 
 	return result
 }
 
-func (m *MultInterpreter) eat(tokenType TokenType) error {
+func (m *MultInterpreter) eat(tokenType lexer.TokenType) error {
 	if m.currentToken.Type != tokenType {
 		return fmt.Errorf("Invalid Token found: %v", tokenType)
 	}
@@ -43,14 +44,14 @@ func (m *MultInterpreter) eat(tokenType TokenType) error {
 func (m *MultInterpreter) term() int64 {
 	result := m.factor()
 
-	for m.currentToken.Type == MULTIPLY || m.currentToken.Type == DIVIDE {
-		if m.currentToken.Type == MULTIPLY {
-			m.eat(MULTIPLY)
+	for m.currentToken.Type == lexer.MULTIPLY || m.currentToken.Type == lexer.DIVIDE {
+		if m.currentToken.Type == lexer.MULTIPLY {
+			m.eat(lexer.MULTIPLY)
 			result *= m.factor()
 		}
 
-		if m.currentToken.Type == DIVIDE {
-			m.eat(DIVIDE)
+		if m.currentToken.Type == lexer.DIVIDE {
+			m.eat(lexer.DIVIDE)
 			result /= m.factor()
 		}
 	}
@@ -61,14 +62,14 @@ func (m *MultInterpreter) term() int64 {
 func (m *MultInterpreter) Expr() (int64, error) {
 	result := m.term()
 
-	for m.currentToken.Type == PLUS || m.currentToken.Type == MINUS {
-		if m.currentToken.Type == PLUS {
-			m.eat(PLUS)
+	for m.currentToken.Type == lexer.PLUS || m.currentToken.Type == lexer.MINUS {
+		if m.currentToken.Type == lexer.PLUS {
+			m.eat(lexer.PLUS)
 			result += m.term()
 		}
 
-		if m.currentToken.Type == MINUS {
-			m.eat(MINUS)
+		if m.currentToken.Type == lexer.MINUS {
+			m.eat(lexer.MINUS)
 			result -= m.term()
 		}
 	}

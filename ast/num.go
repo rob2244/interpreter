@@ -1,14 +1,14 @@
 package ast
 
 import (
-	"github.com/rob2244/interpreter/interpreter"
+	"robinseitz/interpreter/lexer"
 )
 
 type Num struct {
-	token *interpreter.Token
-	value int64
+	Token *lexer.Token
+	Value int64
 }
 
-func NewNum(token *interpreter.Token) *Num {
+func NewNum(token *lexer.Token) *Num {
 	return &Num{token, token.Value.(int64)}
 }

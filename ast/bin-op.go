@@ -1,14 +1,16 @@
 package ast
 
-import "github.com/rob2244/interpreter/interpreter"
+import (
+	"robinseitz/interpreter/lexer"
+)
 
 type BinOp struct {
-	left  interface{}
-	token *interpreter.Token
-	op    rune
-	right interface{}
+	Left  interface{}
+	Token *lexer.Token
+	Op    rune
+	Right interface{}
 }
 
-func NewBinOp(token *interpreter.Token, left, right interface{}) *BinOp {
+func NewBinOp(token *lexer.Token, left, right interface{}) *BinOp {
 	return &BinOp{left, token, token.Value.(rune), right}
 }
