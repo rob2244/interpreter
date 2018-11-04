@@ -2,7 +2,8 @@ package ast
 
 import (
 	"fmt"
-	"robinseitz/interpreter/lexer"
+
+	"github.com/rob2244/interpreter/lexer"
 )
 
 type Parser struct {

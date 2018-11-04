@@ -2,7 +2,7 @@ package interpreter
 
 import (
 	"fmt"
-	"robinseitz/interpreter/lexer"
+	"github.com/rob2244/interpreter/lexer"
 	"strconv"
 )
 

@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
-	"robinseitz/interpreter/ast"
-	"robinseitz/interpreter/interpreter"
-	"robinseitz/interpreter/lexer"
+
+	"github.com/rob2244/interpreter/ast"
+	"github.com/rob2244/interpreter/interpreter"
+	"github.com/rob2244/interpreter/lexer"
 )
 
 // func main() {
@@ -38,8 +38,8 @@ func main() {
 
 		l := lexer.NewLexer(exp)
 		p := ast.NewParser(l)
-		i := interpreter.NewTreeInterpreter(p)
+		i := interpreter.NewRPNPrinter(p)
 
-		fmt.Println(i.Interpret())
+		i.Print()
 	}
 }

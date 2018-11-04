@@ -3,8 +3,8 @@ package interpreter
 import (
 	"fmt"
 	"reflect"
-	"robinseitz/interpreter/ast"
-	"robinseitz/interpreter/lexer"
+	"github.com/rob2244/interpreter/ast"
+	"github.com/rob2244/interpreter/lexer"
 	"strings"
 )
 

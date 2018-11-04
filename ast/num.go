@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"robinseitz/interpreter/lexer"
+	"github.com/rob2244/interpreter/lexer"
 )
 
 type Num struct {
