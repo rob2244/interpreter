@@ -61,8 +61,14 @@ func (p *Parser) term() interface{} {
 }
 
 func (p *Parser) factor() interface{} {
+	token := p.currentToken
+
+	if token.Type == lexer.PLUS {
+		p.eat(lexer.PLUS)
+		return &UnaryOp{token, p.factor()}
+	}
+
 	if p.currentToken.Type == lexer.INTEGER {
-		token := p.currentToken
 		p.eat(lexer.INTEGER)
 		return NewNum(token)
 	}

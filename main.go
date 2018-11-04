@@ -38,7 +38,7 @@ func main() {
 
 		l := lexer.NewLexer(exp)
 		p := ast.NewParser(l)
-		i := interpreter.NewRPNPrinter(p)
+		i := interpreter.NewLISPPrinter(p)
 
 		i.Print()
 	}
